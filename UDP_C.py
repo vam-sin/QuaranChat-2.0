@@ -4,7 +4,7 @@ import time
 
 serverAddressPort = ("127.0.0.1", 20001)
 bufferSize = 1024
-timeout = 0.5
+timeout = 2
 
 class ReliableUDPPacket:
     # Constructor
@@ -26,18 +26,28 @@ class ReliableUDPPacket:
 # Create a UDP socket at client side
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
+pktNumber = '0' # Starts with zero always
+
 # Send to server using created UDP socket
 while True:
-	msgFromClient = input("Your Message:")
-	packet = ReliableUDPPacket(msgFromClient, 'pkt', '1') 
+	msgFromClient = input("Your Message: ")
+	packet = ReliableUDPPacket(msgFromClient, 'pkt', pktNumber) 
 	packet = packet.serialize()
 	bytesToSend = json.dumps(packet).encode('utf-8')
 	# print(bytesToSend)
 	UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 
 	# Receive ACK
-	time.sleep(timeout)
+	print("Waiting for Acknowledgement")
+	UDPClientSocket.settimeout(timeout)
 
-	msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-	rcvdpacket = json.loads(msgFromServer[0].decode('utf-8'))
-	print("Packet from Server: " + rcvdpacket['message'] + ", Type: " + rcvdpacket['msgType'] + ", Number: " + rcvdpacket['Number'])
+	try:
+		msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+		rcvdpacket = json.loads(msgFromServer[0].decode('utf-8'))
+		print("Packet from Server: " + rcvdpacket['message'] + ", Type: " + rcvdpacket['msgType'] + ", Number: " + rcvdpacket['Number'])
+		if pktNumber == '1':
+			pktNumber = '0'
+		else:
+			pktNumber = '1'
+	except socket.timeout:
+		print("Timeout! F")

@@ -27,7 +27,7 @@ UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 # Bind to address and ip
 UDPServerSocket.bind((localIP, localPort))
 
-print("UDP server up and listening")
+print("Welcome to QuaranChat 2.0!")
 
 # Listen for incoming datagrams
 while(True):
@@ -41,3 +41,4 @@ while(True):
     ackpacket = ackpacket.serialize()
     bytesToSend = json.dumps(ackpacket).encode('utf-8')
     UDPServerSocket.sendto(bytesToSend, address)
+    print("Ack Sent")
