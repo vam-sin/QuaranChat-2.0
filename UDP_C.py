@@ -8,14 +8,18 @@ import sys
 # b) Packet Loss ( Done)
 # # Retramsit should take the same message and not ask again
 # c) ACK loss (Done) (Same behavior as a packet loss, have to retransmit that same packet)
-# d) Premature timeout/ dealyed ACK
+# d) Premature timeout/ dealyed ACK (Done)
 
 # Task Set 2
 # a) Pocket Corruption (use checksum)
 
+# Throughput Calcualtions
+start = time.time()
+packets_sent = 0
+
 serverAddressPort = ("127.0.0.1", 20001)
 bufferSize = 1024
-timeout = 2
+timeout = 0.001
 pktNumber = '0' # Starts with zero always
 retransmit = 0 # Flag to say if retransmit or not
 old_message = ''
@@ -40,14 +44,23 @@ class ReliableUDPPacket:
 def Transmit(UDPClientSocket):
 	global retransmit
 	global old_message
+	global packets_sent
 	try:
 		global pktNumber
 		sys.stdout.flush()
 		if retransmit == 0:
-			msgFromClient = input("Your Message: ")
+			print("\n\n\n")
+			print("#################################")
+			print("\n\n\n")
+			# Regular
+			# msgFromClient = input("Your Message: ")
+			# Throughput Calculation
+			msgFromClient = "ClientMessage"
+			print("\n")
 		else:
 			msgFromClient = old_message
-		packet = ReliableUDPPacket(msgFromClient, 'pkt', pktNumber) 
+		packet = ReliableUDPPacket(msgFromClient, 'pkt', pktNumber)
+		print("Packet sent from Client: " + packet.message + ", Type: " + packet.msgType + ", Number: " + packet.Number) 
 		packet = packet.serialize()
 		bytesToSend = json.dumps(packet).encode('utf-8')
 		# print(bytesToSend)
@@ -59,13 +72,22 @@ def Transmit(UDPClientSocket):
 		msgFromServer = UDPClientSocket.recvfrom(bufferSize) # if it doesn't receive in set time, then timeout exception
 		rcvdpacket = json.loads(msgFromServer[0].decode('utf-8'))
 		print("Packet from Server: " + rcvdpacket['message'] + ", Type: " + rcvdpacket['msgType'] + ", Number: " + rcvdpacket['Number'])
+		print("Transmission Successful")
+		packets_sent += 1
+		print(str(packets_sent) + " packets sent in " + str(time.time() - start) + " seconds. \n")
+		
+		# Throughput calculations
+		if (time.time() - start) >= 10.0:
+			print("Throughtput is: " + str(packets_sent/(time.time() - start)) + " packets per second")
+			exit()
+		
 		retransmit = 0
 		if pktNumber == '1':
 			pktNumber = '0'
 		else:
 			pktNumber = '1'
 	except socket.timeout:
-		print("Timeout! Retrasmitting!")
+		print("Timeout! Retrasmitting!\n")
 		retransmit = 1
 		old_message = msgFromClient
 		sys.stdout.flush()
