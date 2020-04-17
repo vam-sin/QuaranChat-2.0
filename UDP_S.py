@@ -1,5 +1,6 @@
 import socket
 import json
+import time
 
 localIP     = "127.0.0.1"
 localPort   = 20001
@@ -21,7 +22,7 @@ class ReliableUDPPacket:
 
     	return packet_dict
 
-# Create a datagram socket
+# Create a datagram socket (895)
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
@@ -37,6 +38,7 @@ while(True):
     print("Packet from Client: " + rcvdpacket['message'] + ", Type: " + rcvdpacket['msgType'] + ", Number: " + str(rcvdpacket['Number']))
     
     # Sending ack to client
+    # time.sleep(4)
     ackpacket = ReliableUDPPacket("Acknowledgement", 'ack', rcvdpacket['Number'])
     ackpacket = ackpacket.serialize()
     bytesToSend = json.dumps(ackpacket).encode('utf-8')
