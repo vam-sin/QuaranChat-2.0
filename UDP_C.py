@@ -2,6 +2,7 @@ import socket
 import json
 import time
 import sys
+import binascii
 
 # Task Set 1
 # a) No loss (Done) 
@@ -11,7 +12,7 @@ import sys
 # d) Premature timeout/ dealyed ACK (Done)
 
 # Task Set 2
-# a) Pocket Corruption (use checksum)
+# a) Pocket Corruption (Done)
 
 # Throughput Calcualtions
 start = time.time()
@@ -19,24 +20,35 @@ packets_sent = 0
 
 serverAddressPort = ("127.0.0.1", 20001)
 bufferSize = 1024
-timeout = 0.001
+timeout = 2
 pktNumber = '0' # Starts with zero always
 retransmit = 0 # Flag to say if retransmit or not
 old_message = ''
 
+def Checksum_Calculation(message, msgType, Number):
+	messagebin = bin(int.from_bytes(message.encode(), 'big'))
+	msgTypebin = bin(int.from_bytes(msgType.encode(), 'big'))
+	Numberbin = bin(int.from_bytes(Number.encode(), 'big'))
+
+	checksum = int(messagebin, 2) + int(msgTypebin, 2) + int(Numberbin, 2)
+
+	return checksum
+ 
 class ReliableUDPPacket:
     # Constructor
     def __init__(self, message, msgType, Number):
         self.message = message
         self.msgType = msgType # pkt or ack
         self.Number = Number
+        self.checksum = Checksum_Calculation(message, msgType, Number)
 
     # has to be done in order to send through the socket
     def serialize(self):
     	packet_dict = {
     		"message": self.message,
     		"msgType": self.msgType,
-    		"Number": self.Number
+    		"Number": self.Number,
+    		"checksum": self.checksum
     	}
 
     	return packet_dict
@@ -53,9 +65,9 @@ def Transmit(UDPClientSocket):
 			print("#################################")
 			print("\n\n\n")
 			# Regular
-			# msgFromClient = input("Your Message: ")
+			msgFromClient = input("Your Message: ")
 			# Throughput Calculation
-			msgFromClient = "ClientMessage"
+			# msgFromClient = "ClientMessage"
 			print("\n")
 		else:
 			msgFromClient = old_message

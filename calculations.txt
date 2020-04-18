@@ -6,7 +6,7 @@ The following are the constant set of parameters used for the throughput calcula
 Throughput Values:
 
 No loss/ delay:
-5426.118497689878 packets per second
+5484.4255981882725 packets per second
 
 90% packet loss:
 6.6970999863363625 packets per second
@@ -23,9 +23,24 @@ No loss/ delay:
 100ms 10ms delay:
 2986.274510996939 packets per second
 
+100ms 10ms distribution normal delay: (Jitter)
+3098.1259871902666 packets per second
+
 100ms 10ms 25% delay:
 2968.389029645956 packets per second
 
 200ms delay:
 2044.3348336297854 packets per second
+
+50% packet corruption:
+262.8541622350366 packets per second
+
+90% packet corruption:
+13.87882160617685 packets per second
+
+50% packet duplication:
+5440.689363276296 packets per second
+
+90% packet duplication:
+5184.891099544545 packets per second
 
