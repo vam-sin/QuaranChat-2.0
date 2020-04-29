@@ -20,8 +20,7 @@ while True:
     # Regular
     msgFromClient = input("Your Message: ")
     # Throughput Calculation
-    # msgFromClient = "ClientMessage"
-    print("\n")
+    print("Inputted\n")
     UDPClientSocket.send(msgFromClient, serverAddressPort)
     packets_sent += 1
     print(str(packets_sent) + " packets sent in " + str(time.time() - start) + " seconds. \n")
