@@ -13,15 +13,15 @@ serverAddressPort = ("127.0.0.1", 20001)
 UDPClientSocket = ReliableUDPSocket()
 
 # Send messages, one by one, to server using created ReliableUDPSocket
-while True:
+while True: 
     sys.stdout.flush()
     print("\n\n\n")
     print("#################################")
     print("\n\n\n")
     # Regular
-    # msgFromClient = input("Your Message: ")
+    msgFromClient = input("Your Message: ")
     # Throughput Calculation
-    msgFromClient = "Hello"
+    # msgFromClient = "Hello"
     # print("Inputted\n")
     UDPClientSocket.send(msgFromClient, serverAddressPort)
     packets_sent += 1

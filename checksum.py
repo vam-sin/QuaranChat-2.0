@@ -19,8 +19,8 @@ def ModifyCarry(z):
     if z >= 2**16:
         z -= 2**16
         z += 1
-        print(z)
-        print(bin(z))
+        # print(z)
+        # print(bin(z))
 
     return z
 
@@ -42,7 +42,7 @@ def ChecksumCalculation(source_ip,destination_ip,protocol,length,source_port,des
     #so, if I have the IP a.b.c.d, then I do: ab + cd where ab corresponds to the binary 16 bits tring of a and b concatenated together
     #similarly for cd as well
     #x represents the sum of the last 16 bits of the binary number
-    print("Part-1")
+    # print("Part-1")
     res = source_ip.split('.')
 
     x = int(res[1]) + int(res[3]) #x = b + d
@@ -50,12 +50,12 @@ def ChecksumCalculation(source_ip,destination_ip,protocol,length,source_port,des
     y = y*256
 
     z = x+y
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z) #after every addition, we have to check whether there has been an oveflow or not
 
     #calculation of adding respective parts of the destination IP address
-    print("Part-2")
+    # print("Part-2")
     res = destination_ip.split('.')
 
     x = int(res[1]) + int(res[3])
@@ -63,46 +63,46 @@ def ChecksumCalculation(source_ip,destination_ip,protocol,length,source_port,des
 
     y = y*256
     z = z+x+y
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z)
 
-    print("Part-3")
+    # print("Part-3")
     z += int(protocol)  #adding the protocol number
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z)
     
 
-    print("Part-4")
+    # print("Part-4")
     z += int(length) #adding the length of the pseudo-header
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z)
 
-    print("Part-5")
+    # print("Part-5")
     z += int(source_port) #adding the source port number
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z)
 
-    print("Part-6")
+    # print("Part-6")
     z += int(dest_port) #adding the destination port number
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z)
 
-    print("Part-7")
+    # print("Part-7")
     z += int(udp_length) #adding the length of the UDP header
-    print(z)
-    print(bin(z))
+    # print(z)
+    # print(bin(z))
     z = ModifyCarry(z)
 
-    print()
-    print("Part-8")
+    # print()
+    # print("Part-8")
     #adding the data sent
     for i in range(0,len(data)):
-        print("Presently at ",data[i]," , that is: ",ord(data[i]))
+        # print("Presently at ",data[i]," , that is: ",ord(data[i]))
         if i%2 == 0:
             temp = ord(data[i])
             temp = temp * 2**8
@@ -110,13 +110,13 @@ def ChecksumCalculation(source_ip,destination_ip,protocol,length,source_port,des
         else:
             temp = ord(data[i])
             z += temp
-        print(z)
-        print(bin(z))
+        # print(z)
+        # print(bin(z))
         ModifyCarry(z)
 
     checksum = onesComplement(z)
-    print(checksum)
-    print(bin(checksum))
+    # print(checksum)
+    # print(bin(checksum))
 
     return checksum
 
@@ -126,7 +126,9 @@ def ChecksumCalculation(source_ip,destination_ip,protocol,length,source_port,des
 def ChecksumVerification(source_ip,destination_ip,protocol,length,source_port,dest_port,udp_length,data,checksum):
     val = ChecksumCalculation(source_ip,destination_ip,protocol,length,source_port,dest_port,udp_length,data)
     if val == checksum:
-        print("Packet not courrupted")
+        return 1
+    else:
+        return 0
 
 if __name__ == '__main__':
     print("Hello")
