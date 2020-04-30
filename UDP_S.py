@@ -5,7 +5,7 @@ localIP     = "127.0.0.1"
 localPort   = 20001
 bufferSize  = 1024
 timeout = 2
-n = 2
+
 # Create a reliable socket
 UDPServerSocket = ReliableUDPSocket(bufferSize  = 1024, timeout = 2)
 
@@ -16,4 +16,5 @@ print("Welcome to QuaranChat 2.0!")
 
 # Listen for incoming datagrams
 while(True):
-    UDPServerSocket.receive(n)
+    received_packet, address = UDPServerSocket.receive()
+    print("Packet from Client: " + received_packet['message'] + ", Type: " + received_packet['msgType'] + ", Number: " + str(received_packet['number']))
