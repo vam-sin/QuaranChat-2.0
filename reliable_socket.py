@@ -15,13 +15,13 @@ class ReliableUDPMessage:
 
     # has to be done in order to send through the socket
     def serialize(self):
-    	packet_dict = {
-    		"message": self.message,
-    		"msgType": self.msgType,
-    		"number": self.number,
+        packet_dict = {
+            "message": self.message,
+            "msgType": self.msgType,
+            "number": self.number,
             "checksum": self.checksum
-    	}
-    	return packet_dict
+        }
+        return packet_dict
 
 class ReliableUDPSocket():
     pktNumber = 0 # Starts with zero always
@@ -53,15 +53,16 @@ class ReliableUDPSocket():
                 self.socket.settimeout(self.timeout)
                 msgFromServer = self.socket.recvfrom(self.bufferSize) 
                 rcvdpacket = json.loads(msgFromServer[0])
-                assert(self.pktNumber == rcvdpacket['number'])
                 if ChecksumVerification("127.0.0.1", "127.0.0.1", 17, 10, 20001, 20001, 1024, rcvdpacket['message'], int(rcvdpacket['checksum'])):
-                    print("Recived acknowledgement was pristine.")
-                    # print("Packet from remote host: ", rcvdpacket['message'], ", Type: ", rcvdpacket['msgType'], ", Number: ", rcvdpacket['number'])
-                    print("Transmission Successful")
-                    self.reverse_pkt_number()
-                    return
+                    print("[CHECKSUM] Recived acknowledgement was not correct.")
+                    if self.pktNumber == rcvdpacket['number']:
+                        print("Transmission Successful")
+                        self.reverse_pkt_number()
+                        return
+                    else:
+                        print("Incorrect ACK received. Retransmit.")
                 else:
-                    print("Received Acknowledgement was corrupt.")
+                    print("[CHECKSUM] Received Acknowledgement was corrupt.")
 
             except socket.timeout:
                 trial_num += 1
