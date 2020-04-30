@@ -40,32 +40,31 @@ class ReliableUDPSocket():
         # print(packet)
         bytesToSend = json.dumps(packet).encode("utf-8")
         trial_num = 0
-        try:
-            self.socket.sendto(bytesToSend, toAddress)
-            print("Waiting for Acknowledgement. Trial ", trial_num)
-            
-            # Wait for ACK -  if it doesn't receive in set time, then timeout exception
-            self.socket.settimeout(self.timeout)
-            msgFromServer = self.socket.recvfrom(self.bufferSize) 
-            rcvdpacket = json.loads(msgFromServer[0])
-            if ChecksumVerification("127.0.0.1", "127.0.0.1", 17, 10, 20001, 20001, 1024, rcvdpacket['message'], int(rcvdpacket['checksum'])):
-                print("Recived Acknowledgement was pristine.")
-                print("Packet from remote host: ", rcvdpacket['message'], ", Type: ", rcvdpacket['msgType'], ", Number: ", rcvdpacket['number'])
-                print("Transmission Successful")
-                if self.pktNumber == 1:
-                    self.pktNumber = 0
+        while True:
+            try:
+                self.socket.sendto(bytesToSend, toAddress)
+                print("Waiting for Acknowledgement. Trial ", trial_num)
+                
+                # Wait for ACK -  if it doesn't receive in set time, then timeout exception
+                self.socket.settimeout(self.timeout)
+                msgFromServer = self.socket.recvfrom(self.bufferSize) 
+                rcvdpacket = json.loads(msgFromServer[0])
+                assert(self.pktNumber == rcvdpacket['number'])
+                if ChecksumVerification("127.0.0.1", "127.0.0.1", 17, 10, 20001, 20001, 1024, rcvdpacket['message'], int(rcvdpacket['checksum'])):
+                    print("Recived Acknowledgement was pristine.")
+                    print("Packet from remote host: ", rcvdpacket['message'], ", Type: ", rcvdpacket['msgType'], ", Number: ", rcvdpacket['number'])
+                    print("Transmission Successful")
+                    if self.pktNumber == 1:
+                        self.pktNumber = 0
+                    else:
+                        self.pktNumber = 1
+                    return
                 else:
-                    self.pktNumber = 1
+                    print("Received Acknowledgement was corrupt.")
 
-                return
-            else:
-                print("Received Acknowledgement was corrupt.")
-                send()
-
-        except socket.timeout:
-            trial_num += 1
-            print("Timeout! Retrasmitting!\n")
-            send()
+            except socket.timeout:
+                trial_num += 1
+                print("Timeout! Retrasmitting!\n")
 
 
     def receive(self):
